@@ -78,9 +78,7 @@ const sessionOptions={
     },
 };
 
-app.get("/",(req,res)=>{
-    res.redirect("/listings")
-})
+
 
 
 
@@ -94,14 +92,6 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-// app.get("/demouser",async(req,res)=>{
-//     let fakeUser=new User({
-//         email:"student@gmail.com",
-//         username:"delta-student",
-//     });
-//     let registeredUser=await User.register(fakeUser,"helloworld");
-//     res.send(registeredUser);
-// });
 
 app.use((req,res,next)=>{
     res.locals.success=req.flash("success");
@@ -115,10 +105,9 @@ app.use("/listings/:id/reviews",reviewsRouter);
 app.use("/",userRouter);
 
 
-// app.all("*", (req, res, next) => {
-//     next(new ExpressError(404, "Page not found"));
-// });
-
+app.use((req,res)=>{
+    res.status(404).send("Page not found")
+});
 
 app.use((err,req,res,next)=>{
     let{statusCode=500,message="Something went wrong"}=err;
@@ -132,7 +121,3 @@ app.listen(8080,()=>{
 });
 
 
-
-
-
-///=======================
