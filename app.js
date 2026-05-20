@@ -2,15 +2,6 @@ if(process.env.NODE_ENV != "production"){
     require('dotenv').config();
 }
 
-// const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
-// let geocodingClient;
-// if (process.env.MAPBOX_TOKEN) {
-//     geocodingClient = mbxGeocoding({ accessToken: process.env.MAPBOX_TOKEN });
-// } else {
-//     console.warn("Mapbox token not set. Geocoding disabled.");
-// }
-
-
 const express=require("express");
 const app=express();
 const mongoose=require("mongoose");
@@ -63,7 +54,7 @@ const store=MongoStore.create({
 });
 
 store.on("error",()=>{
-    console.log("Error in MONGO SESSION STORE",err);
+    console.log("Error in MONGO SESSION STORE",error);
 })
 
 const sessionOptions={
@@ -98,6 +89,10 @@ app.use((req,res,next)=>{
     res.locals.error=req.flash("error");
     res.locals.currUser=req.user;
     next();
+})
+
+app.get("/",(req,res)=>{
+    res.redirect("/listings")
 })
 
 app.use("/listings",listingsRouter);
