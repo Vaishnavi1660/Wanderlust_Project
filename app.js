@@ -24,7 +24,8 @@ const listingsRouter=require("./routes/listing.js");
 const reviewsRouter=require("./routes/review.js");
 const userRouter=require("./routes/user.js");
 
-const dbUrl=process.env.ATLASDB_URL;
+// const dbUrl=process.env.ATLASDB_URL;
+const dbUrl = process.env.ATLASDB_URL ;
 
 main().then(()=>{
     console.log("connected to db");
@@ -45,16 +46,21 @@ app.engine('ejs',ejsMate);
 app.use(express.static(path.join(__dirname,"/public")));
 
 
-const store=MongoStore.create({
-    mongoUrl:dbUrl,
-    crypto:{
-        secret:process.env.SECRET,
-    },
-    touchAfter:24*3600,
+// const store=MongoStore.create({
+//     mongoUrl:dbUrl,
+//     crypto:{
+//         secret:process.env.SECRET,
+//     },
+//     touchAfter:24*3600,
+// });
+
+const store = MongoStore.create({
+    mongoUrl: dbUrl,
+    touchAfter: 24 * 3600,
 });
 
-store.on("error",()=>{
-    console.log("Error in MONGO SESSION STORE",error);
+store.on("err",()=>{
+    console.log("Error in MONGO SESSION STORE",err);
 })
 
 const sessionOptions={
@@ -100,19 +106,30 @@ app.use("/listings/:id/reviews",reviewsRouter);
 app.use("/",userRouter);
 
 
-app.use((req,res)=>{
+app.use((req,res,next)=>{
     res.status(404).send("Page not found")
 });
 
-app.use((err,req,res,next)=>{
-    let{statusCode=500,message="Something went wrong"}=err;
-    res.status(statusCode).render("error.ejs",{message});
-//     // res.status(statusCode).send(message);
-})
+// app.use((err,req,res)=>{
+//     let{statusCode=500,message="Something went wrong"}=err;
+//     res.status(statusCode).render("error.ejs",{message});
+// //     // res.status(statusCode).send(message);
+// })
+
+app.use((err, req, res, next) => {
+
+    console.error(err);
+
+    if (res.headersSent) {
+        return next(err);
+    }
+
+    let { statusCode = 500, message = "Something went wrong" } = err;
+
+    res.status(statusCode).render("error.ejs", { message });
+});
 
 
 app.listen(8080,()=>{
     console.log("server is listening to port");
 });
-
-
